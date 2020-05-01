@@ -11,6 +11,11 @@ version = "0.1.0"
 
 [dependencies]
 thiserror = "*"
+rust_decimal = "*"
+nonempty = "*"
+sha2 = "*"
+serde = { version = "*", features = ["derive"] }
+bincode = "*"
 
 [profile.dev]
 codegen-units = 1
