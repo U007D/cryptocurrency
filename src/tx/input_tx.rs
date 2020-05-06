@@ -1,4 +1,4 @@
-use crate::{error::InternalError, tx::TxIdx, Error, Result, Signature, TxHash};
+use crate::{error::PanicError, tx::TxIdx, Error, Result, Signature, TxHash};
 use bincode::serialize;
 use serde::Serialize;
 
@@ -70,6 +70,6 @@ impl InputTx {
 
     #[must_use]
     pub fn as_bytes(&self) -> Vec<u8> {
-        serialize(self).unwrap_or_else(|err| panic!(InternalError::Serialization(err)))
+        serialize(self).unwrap_or_else(|err| panic!(PanicError::Serialization(err)))
     }
 }

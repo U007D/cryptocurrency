@@ -1,7 +1,6 @@
 // To use the `unsafe` keyword, change to `#![allow(unsafe_code)]` (do not remove); aids auditing.
 #![forbid(unsafe_code)]
 #![forbid(bare_trait_objects)]
-#![warn(clippy::all, clippy::nursery, clippy::pedantic, rust_2018_idioms)]
 // Safety-critical application lints
 #![deny(
     clippy::pedantic,
@@ -10,6 +9,13 @@
     clippy::integer_arithmetic,
     clippy::option_unwrap_used,
     clippy::result_unwrap_used
+)]
+#![warn(
+    clippy::all,
+    clippy::nursery,
+    clippy::pedantic,
+    rust_2018_idioms,
+    clippy::unused_self
 )]
 #![allow(
     clippy::iter_nth_zero,
@@ -24,13 +30,21 @@
 //#![deny(warnings)]
 
 mod consts;
+mod crypto;
 mod error;
+mod key_pair;
+mod signature;
 mod tx;
+mod tx_handler;
 mod utxo;
 mod utxo_pool;
 pub use {
+    crypto::verify_signature,
     error::Error,
-    tx::{Address, InputTx, Operation, OutputTx, Signature, Tx, TxHash, TxIdx},
+    key_pair::KeyPair,
+    signature::Signature,
+    tx::{InputTx, Operation, OutputTx, PublicKey, SecretKey, Tx, TxHash, TxIdx},
+    tx_handler::TxHandler,
     utxo::Utxo,
 };
 pub type Result<T, E = Error> = std::result::Result<T, E>;

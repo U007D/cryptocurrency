@@ -16,6 +16,9 @@ nonempty = "*"
 sha2 = "*"
 serde = { version = "*", features = ["derive"] }
 bincode = "*"
+ed25519-dalek = "*"
+rand = "*"
+derive_more = "*"
 
 [profile.dev]
 codegen-units = 1

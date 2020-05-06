@@ -1,4 +1,5 @@
-use crate::{error::InternalError, tx::address::Address};
+use crate::error::PanicError;
+use crate::tx::PublicKey;
 use bincode::serialize;
 use rust_decimal::Decimal;
 use serde::Serialize;
@@ -8,17 +9,17 @@ pub struct OutputTx {
     /// Value in BitCoins of the output
     value: Decimal,
     /// The address (public key) of the recipient
-    address: Address,
+    address: PublicKey,
 }
 
 impl OutputTx {
     #[must_use]
-    pub const fn new(value: Decimal, address: Address) -> Self {
+    pub const fn new(value: Decimal, address: PublicKey) -> Self {
         Self { value, address }
     }
 
     #[must_use]
     pub fn as_bytes(&self) -> Vec<u8> {
-        serialize(self).unwrap_or_else(|err| panic!(InternalError::Serialization(err)))
+        serialize(self).unwrap_or_else(|err| panic!(PanicError::Serialization(err)))
     }
 }

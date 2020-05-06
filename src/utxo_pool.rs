@@ -25,16 +25,22 @@ impl UtxoPool {
     }
 
     /// Removes the `Utxo` from the pool
-    pub fn remove_utxo(&mut self, utxo: &Utxo) -> Result<OutputTx> {
-        self.hash_map
-            .remove(utxo)
-            .ok_or_else(|| Error::UtxoNotFound(utxo.clone()))
+    pub fn remove_utxo(&mut self, utxo: &Utxo) -> Option<OutputTx> {
+        self.hash_map.remove(utxo)
     }
 
     /// Return the tx output corresponding to `Utxo` or `None` if `Utxo` is not in the pool
-    pub fn tx_output(&self, utxo: &Utxo) -> Result<&OutputTx> {
-        self.hash_map
-            .get(utxo)
-            .ok_or_else(|| Error::UtxoNotFound(utxo.clone()))
+    pub fn tx_output(&self, utxo: &Utxo) -> Option<&OutputTx> {
+        self.hash_map.get(utxo)
+    }
+
+    /// Return true if `Utxo` is in the pool and false otherwise
+    pub fn contains(&self, utxo: &Utxo) -> bool {
+        self.hash_map.contains_key(utxo)
+    }
+
+    /// Returns a `Vec` of all UTXO's in the pool
+    pub fn all_utxos(&self) -> Vec<Utxo> {
+        self.hash_map.iter().map(|(k, v)| k).cloned().collect()
     }
 }
