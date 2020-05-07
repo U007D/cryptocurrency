@@ -1,4 +1,4 @@
-use crate::{consts, tx::Address, Error, Result};
+use crate::{consts, tx::Address, Error, Result, Signature};
 use serde::{Serialize, Serializer};
 use std::{
     fmt::{Debug, Display, Formatter, Result as FmtResult},
@@ -7,6 +7,16 @@ use std::{
 
 #[derive(Clone, Debug, Eq)]
 pub struct PublicKey(ed25519_dalek::PublicKey);
+
+impl PublicKey {
+    pub fn verify(
+        &self,
+        message: &[u8],
+        signature: &Signature,
+    ) -> Result<(), ed25519_dalek::errors::SignatureError> {
+        self.0.verify::<sha2::Sha256>(message, &signature.0)
+    }
+}
 
 impl Address for PublicKey {
     type Error = Error;

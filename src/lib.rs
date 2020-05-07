@@ -30,7 +30,6 @@
 //#![deny(warnings)]
 
 mod consts;
-mod crypto;
 mod error;
 mod key_pair;
 mod signature;
@@ -39,7 +38,6 @@ mod tx_handler;
 mod utxo;
 mod utxo_pool;
 pub use {
-    crypto::verify_signature,
     error::Error,
     key_pair::KeyPair,
     signature::Signature,

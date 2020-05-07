@@ -7,7 +7,7 @@ use std::{
 };
 
 #[derive(Clone, Debug, Eq)]
-pub struct Signature(ed25519_dalek::Signature);
+pub struct Signature(pub(crate) ed25519_dalek::Signature);
 
 impl Display for Signature {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
