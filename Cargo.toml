@@ -16,8 +16,8 @@ nonempty = "*"
 sha2 = "*"
 serde = { version = "*", features = ["derive"] }
 bincode = "*"
-ed25519-dalek = "*"
-rand = "*"
+ed25519-dalek = "1.0.0-pre.3"
+rand = "0.7.3"
 derive_more = "*"
 
 [profile.dev]
@@ -45,3 +45,4 @@ debug-assertions = true
 lto = false
 opt-level = 0
 rpath = false
+

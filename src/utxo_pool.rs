@@ -1,7 +1,7 @@
 use crate::{tx::OutputTx, Error, Result, Utxo};
 use std::collections::HashMap;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct UtxoPool {
     /// The current collection of UTXOs, with each one mapped to its corresponding tx
     /// output
@@ -39,8 +39,8 @@ impl UtxoPool {
         self.hash_map.contains_key(utxo)
     }
 
-    /// Returns a `Vec` of all UTXO's in the pool
-    pub fn all_utxos(&self) -> Vec<Utxo> {
-        self.hash_map.iter().map(|(k, v)| k).cloned().collect()
+    /// Returns an iterator of all UTXO's in the pool
+    pub fn all_utxos(&self) -> impl Iterator<Item = &Utxo> {
+        self.hash_map.iter().map(|(k, _)| k)
     }
 }

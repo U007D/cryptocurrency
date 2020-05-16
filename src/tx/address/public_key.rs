@@ -13,8 +13,8 @@ impl PublicKey {
         &self,
         message: &[u8],
         signature: &Signature,
-    ) -> Result<(), ed25519_dalek::errors::SignatureError> {
-        self.0.verify::<sha2::Sha256>(message, &signature.0)
+    ) -> Result<(), ed25519_dalek::SignatureError> {
+        self.0.verify(message, &signature.0)
     }
 }
 

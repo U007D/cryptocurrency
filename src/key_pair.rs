@@ -2,6 +2,7 @@ use crate::tx::Address;
 use crate::{
     consts,
     tx::{PublicKey, SecretKey},
+    Signature,
 };
 use rand::{CryptoRng, Rng};
 use serde::{Serialize, Serializer};
@@ -23,6 +24,11 @@ impl KeyPair {
     #[must_use]
     pub fn secret_key(&self) -> SecretKey {
         SecretKey::from_slice(self.0.secret.as_bytes()).unwrap_or_else(|err| unreachable!(err))
+    }
+
+    #[must_use]
+    pub fn sign(&self, msg: &[u8]) -> Signature {
+        Signature(self.0.sign(msg))
     }
 }
 

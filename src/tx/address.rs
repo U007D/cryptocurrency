@@ -7,6 +7,7 @@ use std::error::Error as StdError;
 
 pub trait Address {
     type Error: StdError;
+
     fn from_slice(slice: impl AsRef<[u8]>) -> Result<Self, Self::Error>
     where
         Self: Sized;

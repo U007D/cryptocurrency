@@ -44,8 +44,7 @@ impl TxBuilder {
         self.input_txs.get(idx).map(|tx| {
             match tx {
                 InputTx::Signed {
-                    output_idx: _,
-                    prev_tx_hash: _,
+                    output_utxo: _,
                     signature: _,
                 } => tx
                     .clone()
@@ -87,9 +86,9 @@ impl TxBuilder {
     pub fn build(self) -> Result<Tx> {
         Ok(Tx {
             hash: self.hash_tx(),
-            inputs: NonEmptyVec::try_from(self.input_txs)
+            input_txs: NonEmptyVec::try_from(self.input_txs)
                 .ok_or_else(|| Error::CannotBuildTxWithoutInputTxs)?,
-            outputs: NonEmptyVec::try_from(self.output_txs)
+            output_txs: NonEmptyVec::try_from(self.output_txs)
                 .ok_or_else(|| Error::CannotBuildTxWithoutOutputTxs)?,
         })
     }
@@ -98,29 +97,5 @@ impl TxBuilder {
         let mut hasher = Sha256::new();
         hasher.input(&self.raw_tx());
         TxHash(hasher.result().as_slice().to_vec())
-    }
-
-    pub const fn input_txs(&self) -> &Vec<InputTx> {
-        &self.input_txs
-    }
-
-    pub const fn output_txs(&self) -> &Vec<OutputTx> {
-        &self.output_txs
-    }
-
-    pub fn input_tx(&self, idx: TxIdx) -> Option<&InputTx> {
-        self.input_txs.get(usize::from(idx))
-    }
-
-    pub fn output_tx(&self, idx: TxIdx) -> Option<&OutputTx> {
-        self.output_txs.get(usize::from(idx))
-    }
-
-    pub fn n_input_txs(&self) -> usize {
-        self.input_txs.len()
-    }
-
-    pub fn n_output_txs(&self) -> usize {
-        self.output_txs.len()
     }
 }

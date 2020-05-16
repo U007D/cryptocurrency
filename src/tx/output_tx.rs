@@ -19,7 +19,17 @@ impl OutputTx {
     }
 
     #[must_use]
+    pub const fn address(&self) -> &PublicKey {
+        &self.address
+    }
+
+    #[must_use]
     pub fn as_bytes(&self) -> Vec<u8> {
         serialize(self).unwrap_or_else(|err| panic!(PanicError::Serialization(err)))
+    }
+
+    #[must_use]
+    pub const fn value(&self) -> Decimal {
+        self.value
     }
 }

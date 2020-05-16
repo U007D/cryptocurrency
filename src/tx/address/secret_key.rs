@@ -1,4 +1,5 @@
-use crate::{consts, tx::Address, Error, Result};
+use crate::{consts, tx::Address, Error, Result, Signature};
+use rand::{CryptoRng, Rng};
 use serde::{Serialize, Serializer};
 use std::{
     fmt::{Debug, Display, Formatter, Result as FmtResult},
@@ -7,6 +8,20 @@ use std::{
 
 #[derive(Debug)]
 pub struct SecretKey(ed25519_dalek::SecretKey);
+
+impl SecretKey {
+    pub fn new<R: CryptoRng + Rng>(csprng: &mut R) -> Self {
+        Self(ed25519_dalek::SecretKey::generate(csprng))
+    }
+
+    #[must_use]
+    pub fn sign(&self, msg: &[u8]) -> Signature {
+        Signature(
+            ed25519_dalek::ExpandedSecretKey::from(&self.0)
+                .sign(msg, &ed25519_dalek::PublicKey::from(&self.0)),
+        )
+    }
+}
 
 impl Address for SecretKey {
     type Error = Error;

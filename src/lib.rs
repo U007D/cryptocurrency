@@ -31,7 +31,6 @@
 
 mod consts;
 mod error;
-mod key_pair;
 mod signature;
 mod tx;
 mod tx_handler;
@@ -39,7 +38,6 @@ mod utxo;
 mod utxo_pool;
 pub use {
     error::Error,
-    key_pair::KeyPair,
     signature::Signature,
     tx::{InputTx, Operation, OutputTx, PublicKey, SecretKey, Tx, TxHash, TxIdx},
     tx_handler::TxHandler,
