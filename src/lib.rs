@@ -40,7 +40,7 @@ pub use {
     error::Error,
     signature::Signature,
     tx::{InputTx, Operation, OutputTx, PublicKey, SecretKey, Tx, TxHash, TxIdx},
-    tx_handler::TxHandler,
+    tx_handler::{MaxFeeTxHandler, TxHandler},
     utxo::Utxo,
 };
 pub type Result<T, E = Error> = std::result::Result<T, E>;

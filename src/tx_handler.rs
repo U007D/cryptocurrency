@@ -1,26 +1,11 @@
-use crate::{utxo_pool::UtxoPool, InputTx, Tx};
+mod max_fee_tx_handler;
+mod validated_tx;
+
+use crate::{utxo_pool::UtxoPool, InputTx, OutputTx, Tx};
+pub use max_fee_tx_handler::MaxFeeTxHandler;
 use rust_decimal::Decimal;
-use std::{collections::HashSet, ops::Deref};
-
-/// `add_validated_output_txs_to_utxo_pool()` and `remove_validated_input_txs_from_utxo_pool()`
-/// expect only validated `tx`s to be passed in.  `ValidatedTx` is a newtype which expresses this
-/// precondition to the typesystem.
-#[derive(Debug)]
-pub struct ValidatedTx<'tx>(&'tx Tx);
-
-impl<'tx> ValidatedTx<'tx> {
-    pub const fn new(tx: &'tx Tx) -> Self {
-        Self(tx)
-    }
-}
-
-impl Deref for ValidatedTx<'_> {
-    type Target = Tx;
-
-    fn deref(&self) -> &Self::Target {
-        self.0
-    }
-}
+use std::collections::HashSet;
+pub use validated_tx::ValidatedTx;
 
 #[derive(Debug)]
 pub struct TxHandler {
@@ -126,25 +111,32 @@ impl TxHandler {
             .map_or_else(|| false, |_| true)
     }
 
+    fn sum_of_inputs<'a, I>(&self, mut itxs: I) -> Option<Decimal>
+    where
+        I: Iterator<Item = &'a InputTx>,
+    {
+        itxs.try_fold(Decimal::from(0), |acc, itx| match itx {
+            InputTx::Signed {
+                output_utxo: utxo,
+                signature: _,
+            } => self
+                .utxo_pool
+                .tx_output(utxo)
+                .and_then(|otx| acc.checked_add(otx.value())),
+            _ => None,
+        })
+    }
+
     fn sum_of_inputs_ge_sum_of_outputs(&self, tx: &Tx) -> bool {
-        tx.input_txs()
-            .try_fold(Decimal::from(0), |acc, itx| match itx {
-                InputTx::Signed {
-                    output_utxo: utxo,
-                    signature: _,
-                } => self
-                    .utxo_pool
-                    .tx_output(utxo)
-                    .and_then(|otx| acc.checked_add(otx.value())),
-                _ => None,
-            })
-            .map_or_else(
-                || false,
-                |i_sum| {
-                    tx.output_txs()
-                        .try_fold(Decimal::from(0), |acc, otx| acc.checked_add(otx.value()))
-                        .map_or_else(|| false, |o_sum| i_sum >= o_sum)
-                },
-            )
+        self.sum_of_inputs(tx.input_txs())
+            .and_then(|i_sum| Self::sum_of_outputs(tx.output_txs()).map(|o_sum| i_sum >= o_sum))
+            .map_or_else(|| false, |ge| ge)
+    }
+
+    fn sum_of_outputs<'a, O>(mut otxs: O) -> Option<Decimal>
+    where
+        O: Iterator<Item = &'a OutputTx>,
+    {
+        otxs.try_fold(Decimal::from(0), |acc, otx| acc.checked_add(otx.value()))
     }
 }

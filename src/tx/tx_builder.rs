@@ -3,7 +3,7 @@ pub use crate::{
     tx::{Address, InputTx, OutputTx, PublicKey, SecretKey, Tx},
     TxHash, TxIdx,
 };
-use crate::{Error, Result, Signature, Utxo};
+use crate::{Error, Result, Signature};
 use nonempty::NonEmpty as NonEmptyVec;
 use rust_decimal::Decimal;
 use sha2::{Digest, Sha256};
@@ -27,40 +27,6 @@ impl TxBuilder {
     pub fn add_output(&mut self, value: Decimal, address: PublicKey) -> &mut Self {
         self.output_txs.push(OutputTx::new(value, address));
         self
-    }
-
-    // TODO: This is about as expensive as possible; refactor using `HashMap` and less (no?) copying
-    fn remove_input(&mut self, utxo: &Utxo) -> Result<&mut Self> {
-        self.input_txs = self
-            .input_txs
-            .iter()
-            .filter(|el| utxo != *el)
-            .cloned()
-            .collect();
-        Ok(self)
-    }
-
-    fn raw_tx_unsigned(&self, idx: usize) -> Option<Vec<u8>> {
-        self.input_txs.get(idx).map(|tx| {
-            match tx {
-                InputTx::Signed {
-                    output_utxo: _,
-                    signature: _,
-                } => tx
-                    .clone()
-                    .unsign()
-                    .unwrap_or_else(|err| unreachable!(err))
-                    .as_bytes(),
-                t => t.as_bytes(),
-            }
-            .into_iter()
-            .chain(
-                self.output_txs
-                    .iter()
-                    .flat_map(|tx| tx.as_bytes().into_iter()),
-            )
-            .collect()
-        })
     }
 
     pub fn add_signature(&mut self, signature: Signature, idx: TxIdx) -> Result<&mut Self> {
