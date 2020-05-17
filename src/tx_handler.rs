@@ -1,7 +1,26 @@
-use crate::utxo_pool::UtxoPool;
-use crate::{InputTx, Tx};
+use crate::{utxo_pool::UtxoPool, InputTx, Tx};
 use rust_decimal::Decimal;
-use std::collections::HashSet;
+use std::{collections::HashSet, ops::Deref};
+
+/// `add_validated_output_txs_to_utxo_pool()` and `remove_validated_input_txs_from_utxo_pool()`
+/// expect only validated `tx`s to be passed in.  `ValidatedTx` is a newtype which expresses this
+/// precondition to the typesystem.
+#[derive(Debug)]
+pub struct ValidatedTx<'tx>(&'tx Tx);
+
+impl<'tx> ValidatedTx<'tx> {
+    pub const fn new(tx: &'tx Tx) -> Self {
+        Self(tx)
+    }
+}
+
+impl Deref for ValidatedTx<'_> {
+    type Target = Tx;
+
+    fn deref(&self) -> &Self::Target {
+        self.0
+    }
+}
 
 #[derive(Debug)]
 pub struct TxHandler {
@@ -60,7 +79,7 @@ impl TxHandler {
     pub fn is_valid_tx(&self, tx: &Tx) -> bool {
         self.all_claimed_outputs_exist(tx)
             && self.all_input_signatures_valid(tx)
-            && self.no_utxo_is_multiply_claimed(tx)
+            && Self::no_utxo_is_multiply_claimed(tx)
             && Self::all_output_values_are_non_negative(tx)
             && self.sum_of_inputs_ge_sum_of_outputs(tx)
     }
@@ -70,10 +89,29 @@ impl TxHandler {
     /// updating the current UTXO pool as appropriate.
     #[must_use]
     pub fn handle_txs(&mut self, possible_txs: &[Tx]) -> Vec<Tx> {
-        unimplemented!()
+        let valid_txs = possible_txs
+            .iter()
+            .filter(|tx| self.is_valid_tx(tx))
+            .cloned()
+            .collect::<Vec<_>>();
+        valid_txs
+            .iter()
+            .map(|tx| ValidatedTx::new(tx))
+            .for_each(|vtx| {
+                self.utxo_pool
+                    .remove_validated_input_txs(&vtx)
+                    .unwrap_or_else(|| {
+                        unreachable!(
+                            "Valid input tx not found in `utxo_pool` (single-threaded context)."
+                        )
+                    })
+                    .add_validated_output_txs(&vtx)
+                    .unwrap_or_else(|err| unreachable!(err));
+            });
+        valid_txs
     }
 
-    fn no_utxo_is_multiply_claimed(&self, tx: &Tx) -> bool {
+    fn no_utxo_is_multiply_claimed(tx: &Tx) -> bool {
         tx.input_txs()
             .try_fold(HashSet::new(), |mut set, itx| match itx {
                 InputTx::Signed {

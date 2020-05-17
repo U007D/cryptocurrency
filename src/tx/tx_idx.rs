@@ -1,5 +1,6 @@
+use crate::Error;
 use serde::Serialize;
-use std::mem::size_of;
+use std::{convert::TryFrom, mem::size_of};
 
 pub type TxIdxTyp = u64;
 
@@ -12,6 +13,16 @@ impl TxIdx {
     #[must_use]
     pub fn as_arr(self) -> [u8; size_of::<TxIdxTyp>()] {
         self.0.to_ne_bytes()
+    }
+}
+
+impl TryFrom<usize> for TxIdx {
+    type Error = Error;
+
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        Ok(Self(
+            TxIdxTyp::try_from(value).map_err(|_| Error::TooManyTxs(value))?,
+        ))
     }
 }
 

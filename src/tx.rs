@@ -15,8 +15,8 @@ pub use output_tx::OutputTx;
 pub use tx_builder::TxBuilder;
 pub use tx_hash::TxHash;
 pub use tx_idx::TxIdx;
-pub(crate) use tx_idx::TxIdxTyp;
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Tx {
     /// Hash of the tx, its unique ID
     hash: TxHash,

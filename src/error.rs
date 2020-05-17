@@ -19,6 +19,8 @@ pub enum Error {
     TxnIdxOutOfBounds(TxIdx),
     #[error("{}: {:?}", msg::ERR_KEY_CONSTRUCTION, 0)]
     KeyConstruction(SignatureError),
+    #[error("{}.", msg::ERR_TOO_MANY_TXS_IN_TX_LIST)]
+    TooManyTxs(usize),
 }
 
 impl From<SignatureError> for Error {

@@ -13,3 +13,4 @@ pub const ERR_TX_IDX_OUT_OF_BOUNDS: &str = "Error: Supplied Transaction Index is
 pub const ERR_INTERNAL: &str = "Internal error (bug)";
 pub const ERR_KEY_CONSTRUCTION: &str = "Error constructing key from byte slice";
 pub const ERR_SIGNATURE: &str = "Error constructing signature";
+pub const ERR_TOO_MANY_TXS_IN_TX_LIST: &str = "Error: Too many transactions in transaction list";
