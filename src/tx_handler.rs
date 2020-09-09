@@ -44,7 +44,7 @@ impl TxHandler {
                 .utxo_pool
                 .tx_output(utxo)
                 .and_then(|otx| otx.address().verify(&utxo.as_vec(), signature).ok())
-                .map_or_else(|| false, |_| true),
+                .is_some(),
             _ => false,
         })
     }

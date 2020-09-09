@@ -1,4 +1,5 @@
 use crate::{consts, tx::Address, Error, Result, Signature};
+use ed25519_dalek::Verifier;
 use serde::{Serialize, Serializer};
 use std::{
     fmt::{Debug, Display, Formatter, Result as FmtResult},

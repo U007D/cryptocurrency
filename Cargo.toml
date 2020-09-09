@@ -10,15 +10,15 @@ repository = "https://github.com/u007d/scrooge_coin"
 version = "0.1.0"
 
 [dependencies]
-thiserror = "*"
-rust_decimal = "*"
-nonempty = "*"
-sha2 = "*"
+thiserror = "1"
+rust_decimal = "1"
+nonempty = "0.5"
+sha2 = "0.8"
 serde = { version = "*", features = ["derive"] }
-bincode = "*"
-ed25519-dalek = "1.0.0-pre.3"
-rand = "0.7.3"
-derive_more = "*"
+bincode = "1"
+ed25519-dalek = "1"
+rand = "0.7"
+derive_more = "0.99"
 
 [profile.dev]
 codegen-units = 1

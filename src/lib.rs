@@ -7,8 +7,7 @@
     clippy::float_cmp_const,
     clippy::indexing_slicing,
     clippy::integer_arithmetic,
-    clippy::option_unwrap_used,
-    clippy::result_unwrap_used
+    clippy::unwrap_used
 )]
 #![warn(
     clippy::all,
@@ -37,10 +36,9 @@ mod tx_handler;
 mod utxo;
 mod utxo_pool;
 pub use {
-    error::Error,
+    error::{Error, Result},
     signature::Signature,
     tx::{InputTx, Operation, OutputTx, PublicKey, SecretKey, Tx, TxHash, TxIdx},
     tx_handler::{MaxFeeTxHandler, TxHandler},
     utxo::Utxo,
 };
-pub type Result<T, E = Error> = std::result::Result<T, E>;

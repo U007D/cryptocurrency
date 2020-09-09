@@ -22,7 +22,7 @@ pub enum InputTx {
 
 impl InputTx {
     #[must_use]
-    pub fn new(prev_tx_hash: TxHash, output_idx: TxIdx) -> Self {
+    pub const fn new(prev_tx_hash: TxHash, output_idx: TxIdx) -> Self {
         Self::Unsigned {
             output_utxo: Utxo::new(prev_tx_hash, output_idx),
         }
